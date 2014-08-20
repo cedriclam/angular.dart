@@ -3,6 +3,25 @@
 set -e -o pipefail
 . "$(dirname $0)/../env.sh"
 
+# Skip tests for branches based on the g3v1x channel with Dart 1.5.8.
+# g3v1x uses dependency overrides that cannot be satisfied by the pub tool
+# shipper in Dart version 1.5.8.
+#
+# Ref: https://travis-ci.org/angular/angular.dart/jobs/33106780
+# 
+#   Dart VM version: 1.5.8 (Tue Jul 29 07:05:41 2014) on "linux_x64"
+#   Resolving dependencies... 
+#   Incompatible version constraints on barback:
+#   - angular 0.13.0 depends on version 0.14.1+3
+#   - pub itself depends on version >=0.13.0 <0.14.1
+if git merge-base --is-ancestor 44577768e6bd4ac649703f6172c2490bce4f9132 HEAD ; then
+  if [[ "$(dart --version 2>&1)" =~ "Dart VM version: 1.5.8" ]]; then
+    echo '==========='
+    echo '== SKIPPING  =='
+    echo '==========='
+  fi
+fi
+
 echo '==========='
 echo '== BUILD =='
 echo '==========='
